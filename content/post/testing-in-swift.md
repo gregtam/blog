@@ -1,6 +1,7 @@
 ---
 authors:
 - ybai
+- dancarter
 categories:
 - Swift
 - Swift 3
@@ -13,34 +14,31 @@ short: |
 title: Testing in Swift with dependencies out of control
 ---
 ## Background
-Pivots often have work photos mixed in with their personal photos on their phone
-and never get deleted. So we built an iOS app in Swift 3 to help Pivots to deal
-with client photos from their phone. By the nature of the app, we need to talk
-to native [iOS Photos library](https://developer.apple.com/reference/photos),
-integrate with Google Drive, and some other share option views. Testing our code
-without worrying about external libraries becomes crucial to us.
+It is common for pivots to find their phones cluttered with work photos that never get deleted. To address this problem, we built an iOS app in Swift 3 to help pivots quickly find and take action on their work photos. By the nature of the app, we found ourselves working with the native [iOS Photos library](https://developer.apple.com/reference/photos), integrating with Google Drive, and working with various views for sharing photos. The ability to easily test our code while working around various integrations was crucial for our project.
 
 {{< responsive-figure src="/images/testing-in-swift/icon.png" class="right" >}}
 
-We had quite a journey figuring out our testing strategies against those depending
-libraries both in unit tests and in UI tests. And now when we look back, we would
-love to tell use 3 months ago to follow the following suggestions:
+It was quite a journey for us to find maintainable testing strategies for our code that dealt with these external dependencies. Looking back, there are three main points we would love to be able to share with ourselves three months ago:
 
-* Inject the dependencies with protocols and use fakes in tests
-* If something is hard to test, don't try too hard, abstract it out instead
-* If you are digging too deep into the depending library source code, then you are doing it wrong
+* Inject all dependencies with protocols and use fakes in tests
+* If something is hard to test, don't spend too much time on it, abstract it out instead
+* If you are digging too deeply into the dependent library's source code, then you are doing it wrong
 
-We are going to explain more about our testing strategies below. We are using [UIViewController](https://developer.apple.com/reference/uikit/uiviewcontroller) as example of native libraries that we can't change for testing and Google services([Signin](https://developers.google.com/identity/sign-in/ios/start-integrating) and [Drive](https://developers.google.com/drive/v3/web/quickstart/ios?ver=swift)) as example of external dependencies testing.
+To illustrate the testing strategies we landed upon, we will use [UIViewController](https://developer.apple.com/reference/uikit/uiviewcontroller) as an example of a native library dependency, and Google services([Signin](https://developers.google.com/identity/sign-in/ios/start-integrating) and [Drive](https://developers.google.com/drive/v3/web/quickstart/ios?ver=swift)) as examples of external dependencies.
 
 ---
 ## Unit Tests
 
-In our app, PhotosViewController is the rootViewController that we are mainly testing, and we uses dozens of depending services and views to process detailed tasks to isolate responsibilities.
+The PhotosViewController is the rootViewController and our main target for unit testing in our app. It relies on over a dozen other views and services to complete tasks and isolate responsibilities.
 
 ### **Dependency Injection**
 
+!!!!!!!!!!!!!-------- REWRITE --------!!!!!!!!!!!!!
 With [dependency injection](https://en.wikipedia.org/wiki/Inversion_of_control), the depending modules are initiated outside of our testing subject. Our testing subject can use the injected modules according to methods defined through abstraction ([protocol](https://developer.apple.com/library/content/documentation/Swift/Conceptual/Swift_Programming_Language/Protocols.html) in Swift, [interface](https://docs.oracle.com/javase/tutorial/java/concepts/interface.html) in Java). This is essential for unit testing because we can initiate our testing subject with fake modules, which also conform the same abstraction, in tests.
+!!!!!!!!!!!!!-------- REWRITE --------!!!!!!!!!!!!!
 
+
+!!!!!!!!!!!!!-------- MOVE TO UI TESTS --------!!!!!!!!!!!!!
 Here is the example of using [Swinject](https://github.com/Swinject/Swinject) to inject dependencies in our iOS app:
 
 ```Swift
@@ -78,6 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 ```
+!!!!!!!!!!!!!-------- MOVE TO UI TESTS --------!!!!!!!!!!!!!
 
 ### **Faking with Protocol**
 
